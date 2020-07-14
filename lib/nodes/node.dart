@@ -1,8 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:mine_sweeper/helper/helper.dart';
 
 abstract class Node implements NodeType {
+
+  static Helper helper = new Helper();
   bool isOpened = false;
   bool isFlag = false;
   //for storing the number that it represents.
@@ -13,6 +16,10 @@ abstract class Node implements NodeType {
       throw ("Unsupported value");
     }
     else num.setInt8(0, n);
+  }
+
+  onTap() {
+    isOpened = true;
   }
 
   int getValue() {
@@ -33,14 +40,30 @@ abstract class Node implements NodeType {
     isFlag = !isFlag;
   }
 
+  @override
+  String getPath() {
+    // TODO: implement getPath
+    if (isFlagged())
+      return Node.helper.getFlaggedImage();
+
+    if (!isOpened) {
+      return Node.helper.getClosedImage();
+    }
+
+    return null;
+  }
+
 }
 
 class NodeType{
   bool isBomb(){}
   bool isCorrectlyFlagged(){}
+  String getPath(){}
 }
 
 class BombNode extends Node{
+
+  String path = "";
 
   BombNode(int n) : super(n);
 
@@ -52,8 +75,13 @@ class BombNode extends Node{
 
   @override
   bool isCorrectlyFlagged() {
-    // TODO: implement isCorrectlyFlagged
     return super.isFlagged();
+  }
+
+  @override
+  String getPath() {
+    String x = super.getPath();
+    return x != null ? x : Node.helper.getBombImage();
   }
 
 }
@@ -70,8 +98,13 @@ class SafeNode extends Node {
 
   @override
   bool isCorrectlyFlagged() {
-    // TODO: implement isCorrectlyFlagged
     return !super.isFlagged();
+  }
+
+  @override
+  String getPath() {
+    String x = super.getPath();
+    return x != null ? x : Node.helper.getSafeNodeImage(getValue());
   }
 
 }

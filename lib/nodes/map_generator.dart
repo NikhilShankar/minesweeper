@@ -21,6 +21,9 @@ class MapGenerator {
     this.column = x.getMapHeight();
     factory = new NodeFactory();
     map = List.generate(row, (i) => List<Node>(column), growable: false);
+  }
+
+  refreshMap() {
     for(int k = 0; k < row ; k ++) {
       for (int l = 0; l < column; l++) {
         map[k][l] = factory.getNode(0);
@@ -29,12 +32,12 @@ class MapGenerator {
   }
 
   List<List<Node>> getNewMap() {
+    refreshMap();
     int row = x.getMapWidth();
     int col = x.getMapHeight();
     int totalNodes = row * col;
     Random random = new Random();
     int placedBombs = 0;
-
     while (placedBombs != x.getBombNum()) {
       //We are not placing bombs in the corners or fence lines.
       //This greatly reduces conditions that we need to check and hence performance improves.
@@ -52,7 +55,6 @@ class MapGenerator {
             }
             Node n = map[k][l];
             n.incrementValue();
-            print("Value" + n.getValue().toString() + " hash : " + n.hashCode.toString());
             map[k][l] = n;
           }
         }

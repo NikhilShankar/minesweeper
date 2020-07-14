@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mine_sweeper/nodes/map_generator.dart';
 import 'package:mine_sweeper/nodes/prefs.dart';
+import 'package:mine_sweeper/widgets/node_widget.dart';
 
 import 'nodes/node.dart';
 
@@ -50,28 +51,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   Difficulty diff = new Difficulty(isHard: true);
   MapGenerator generator;
+  List<List<Node>> list;
 
   _MyHomePageState() {
     generator = new MapGenerator(diff);
-    List<List<Node>> list =  generator.getNewMap();
-    for(int i = 0; i < generator.row; i++) {
-      String s = "";
-      for(int j = 0; j < generator.column; j++) {
-        s+=list[i][j].getValue().toString();
-      }
-      print(s);
-    }
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+    list =  generator.getNewMap();
+    print("Hash" + list.hashCode.toString());
   }
 
   @override
@@ -91,38 +76,72 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
+        child: GridView.builder(
+          padding: EdgeInsets.all(5),
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: generator.column * generator.row,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: generator.column,
+          ),
+          itemBuilder: (context, position) {
+            int cPos = position - 1;
+            int row = (cPos / generator.column).toInt();
+            int col = cPos % generator.column;
+            return InkWell(
+              child: new NodeWidget(node: list[row][col]),
+              onLongPress: (() {
+                list[row][col].setFlag();
+                setState(() {
+
+                });
+              }),
+              onTap: ((){
+                openUp(row, col);
+                //list[row][col].onTap();
+                if(list[row][col].isBomb()) {
+                  print("Game Over");
+                }
+                setState(() {
+
+                });
+              }),
+            );
+
+          },
+        )
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: startNewGame,
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: Icon(Icons.settings_backup_restore),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  openUp(row, col) {
+    if(row >= generator.row || row < 0 || col >= generator.column || col< 0) return;
+    if(list[row][col].isOpened) return;
+    if(list[row][col].getValue() != 0) {
+      list[row][col].onTap();
+      return;
+    }
+    list[row][col].onTap();
+    openUp(row-1, col);
+    openUp(row+1, col);
+    openUp(row, col -1);
+    openUp(row,col+1);
+  }
+
+  void startNewGame() {
+    list = generator.getNewMap();
+    print("Hash" + list.hashCode.toString());
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+    });
   }
 }
