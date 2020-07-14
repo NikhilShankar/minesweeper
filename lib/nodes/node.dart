@@ -19,6 +19,10 @@ abstract class Node implements NodeType {
     return num.getInt8(0);
   }
 
+  int incrementValue() {
+    num.setInt8(0, num.getUint8(0) + 1);
+  }
+
   @override
   bool isFlagged() {
     // TODO: implement isFlagged

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mine_sweeper/nodes/map_generator.dart';
+import 'package:mine_sweeper/nodes/prefs.dart';
+
+import 'nodes/node.dart';
 
 void main() => runApp(MyApp());
 
@@ -44,6 +48,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  Difficulty diff = new Difficulty(isHard: true);
+  MapGenerator generator;
+
+  _MyHomePageState() {
+    generator = new MapGenerator(diff);
+    List<List<Node>> list =  generator.getNewMap();
+    for(int i = 0; i < generator.row; i++) {
+      String s = "";
+      for(int j = 0; j < generator.column; j++) {
+        s+=list[i][j].getValue().toString();
+      }
+      print(s);
+    }
+  }
 
   void _incrementCounter() {
     setState(() {
