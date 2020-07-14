@@ -12,11 +12,13 @@ class MapGenerator {
   int row;
   int column;
   var map;
-  Difficulty x;
+  Config config;
+  int opened = 0;
+  int flagsUsed = 0;
   NodeFactory factory;
 
-  MapGenerator(Difficulty x) {
-    this.x = x;
+  MapGenerator(Config x) {
+    this.config = x;
     this.row = x.getMapWidth();
     this.column = x.getMapHeight();
     factory = new NodeFactory();
@@ -31,14 +33,19 @@ class MapGenerator {
     }
   }
 
+  refreshFlags() {
+    opened = 0;
+    flagsUsed = 0;
+  }
+
   List<List<Node>> getNewMap() {
     refreshMap();
-    int row = x.getMapWidth();
-    int col = x.getMapHeight();
+    int row = config.getMapWidth();
+    int col = config.getMapHeight();
     int totalNodes = row * col;
     Random random = new Random();
     int placedBombs = 0;
-    while (placedBombs != x.getBombNum()) {
+    while (placedBombs != config.getBombNum()) {
       //We are not placing bombs in the corners or fence lines.
       //This greatly reduces conditions that we need to check and hence performance improves.
       int rowNum = random.nextInt(row - 2) + 1;
@@ -60,9 +67,22 @@ class MapGenerator {
         }
       }
     }
-
     return map;
+  }
 
+  longPress(bool isFlag) {
+    if(isFlag)
+      flagsUsed++;
+    else
+      flagsUsed--;
+  }
+
+  addOpened() {
+    opened++;
+  }
+
+  bool gameFinished() {
+    return (flagsUsed + opened) == (config.getMapWidth() * config.getMapHeight());
   }
 
 }

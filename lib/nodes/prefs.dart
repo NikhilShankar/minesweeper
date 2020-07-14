@@ -3,19 +3,41 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:mine_sweeper/nodes/node.dart';
 
-class Difficulty {
-  bool isHard;
-  Difficulty({this.isHard});
+class Config {
+  Level level;
+
+  Config({this.level});
 
   int getBombNum() {
-    return isHard ? 10 : 5;
+    switch(level) {
+      case Level.medium:
+        return 40;
+      case Level.easy:
+        return 10;
+    }
   }
 
   int getMapWidth() {
-    return isHard ? 12 : 8;
+    switch(level) {
+      case Level.medium:
+        return 13;
+      case Level.easy:
+        return 8;
+    }
   }
 
   int getMapHeight() {
-    return isHard ? 12 : 8;
+    switch(level) {
+      case Level.medium:
+        return 13;
+      case Level.easy:
+        return 8;
+    }
   }
 }
+
+enum Level {
+  medium,
+  easy
+}
+

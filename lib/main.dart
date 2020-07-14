@@ -49,7 +49,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  Difficulty diff = new Difficulty(isHard: true);
+  Config diff = new Config(level: Level.medium);
   MapGenerator generator;
   List<List<Node>> list;
 
@@ -91,13 +91,16 @@ class _MyHomePageState extends State<MyHomePage> {
             return InkWell(
               child: new NodeWidget(node: list[row][col]),
               onLongPress: (() {
-                list[row][col].setFlag();
+                bool isFlag = list[row][col].setFlag();
+                generator.longPress(isFlag);
+                print("Finished" + generator.gameFinished().toString());
                 setState(() {
 
                 });
               }),
               onTap: ((){
                 openUp(row, col);
+                print("Finished" + generator.gameFinished().toString());
                 //list[row][col].onTap();
                 if(list[row][col].isBomb()) {
                   print("Game Over");
@@ -124,9 +127,11 @@ class _MyHomePageState extends State<MyHomePage> {
     if(list[row][col].isOpened) return;
     if(list[row][col].getValue() != 0) {
       list[row][col].onTap();
+      generator.addOpened();
       return;
     }
     list[row][col].onTap();
+    generator.addOpened();
     openUp(row-1, col);
     openUp(row+1, col);
     openUp(row, col -1);

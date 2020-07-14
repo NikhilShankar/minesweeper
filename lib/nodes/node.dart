@@ -36,8 +36,9 @@ abstract class Node implements NodeType {
     return isFlag;
   }
 
-  void setFlag() {
+  bool setFlag() {
     isFlag = !isFlag;
+    return isFlag;
   }
 
   @override
