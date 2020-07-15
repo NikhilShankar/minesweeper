@@ -7,7 +7,7 @@ class CellFactory {
   CellFactory(){}
 
   Cell getCell(int num) {
-    if(num < 8)
+    if(num <= 8)
       return new SafeCell(num);
     return new MineCell(num);
 
