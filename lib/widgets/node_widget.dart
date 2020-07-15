@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mine_sweeper/nodes/map_generator.dart';
+import 'package:mine_sweeper/nodes/game_manager.dart';
 import 'package:mine_sweeper/nodes/node.dart';
 import 'package:mine_sweeper/nodes/prefs.dart';
 import 'package:flutter/cupertino.dart';

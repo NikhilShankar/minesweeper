@@ -1,6 +1,9 @@
 
 import 'dart:collection';
 
+import 'package:mine_sweeper/nodes/prefs.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Helper {
 
   static final Helper _instance = Helper._privateConstructor();
@@ -39,6 +42,34 @@ class Helper {
 
   String getClosedImage() {
     return faceDownImage;
+  }
+
+
+  //Preferences Helper
+  static const String HISCORE = "hiscore_time";
+
+  //get hi score for different levels.
+  Future<String> getHighScore(Level level) async {
+      String day = level.toString().split('.').last;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int hi = prefs.getInt(HISCORE + day);
+      if (hi != null)
+        return hi.toString();
+      return null;
+  }
+
+  //Set hi score for different levels.
+  setHiScore(int time, Level level) async {
+      String day = level.toString().split('.').last;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      int hi = prefs.getInt(HISCORE + day);
+      if(hi == null) {
+        prefs.setInt(HISCORE + day, time);
+      } else {
+        if(time > hi) {
+          prefs.setInt(HISCORE + day, time);
+        }
+      }
   }
 
 }

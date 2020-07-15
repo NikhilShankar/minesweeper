@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:mine_sweeper/helper/helper.dart';
 import 'package:mine_sweeper/nodes/node.dart';
 import 'package:mine_sweeper/nodes/prefs.dart';
 
@@ -17,6 +18,8 @@ class MapGenerator {
   int flagsUsed = 0;
   bool bombPressed = false;
   NodeFactory factory;
+  int points = 0;
+  int time = 0;
 
   MapGenerator(Config x) {
     this.config = x;
@@ -37,6 +40,8 @@ class MapGenerator {
   refreshFlags() {
     opened = 0;
     flagsUsed = 0;
+    time = 0;
+    points = 0;
   }
 
   List<List<Node>> getNewMap() {
@@ -72,13 +77,18 @@ class MapGenerator {
   }
 
   longPress(bool isFlag) {
-    if(isFlag)
+    if(isFlag) {
       flagsUsed++;
-    else
+      points+=100;
+    } else {
       flagsUsed--;
+      points-=100;
+    }
+
   }
 
   addOpened() {
+    points += 10;
     opened++;
   }
 
@@ -86,8 +96,17 @@ class MapGenerator {
     bombPressed = true;
   }
 
+  bool isBombPressed() {
+    return bombPressed;
+  }
+
   bool gameFinished() {
-    return bombPressed || (flagsUsed + opened) == (config.getMapWidth() * config.getMapHeight());
+    bool finished =  bombPressed || (flagsUsed + opened) == (config.getMapWidth() * config.getMapHeight());
+    if(finished && !bombPressed) {
+      print("HI SCORE CREATED");
+      Helper().setHiScore(time, config.level);
+    }
+    return finished;
   }
 
 }

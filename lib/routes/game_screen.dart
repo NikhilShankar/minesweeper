@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mine_sweeper/nodes/map_generator.dart';
+import 'package:mine_sweeper/nodes/game_manager.dart';
 import 'package:mine_sweeper/nodes/node.dart';
 import 'package:mine_sweeper/nodes/prefs.dart';
 import 'package:mine_sweeper/widgets/node_widget.dart';
@@ -11,7 +11,9 @@ import 'package:path/path.dart';
 class GameScreenPage extends StatefulWidget {
   static final routeName = "/gamescreen";
 
-  GameScreenPage({Key key, this.title}) : super(key: key);
+  Level level = Level.easy;
+
+  GameScreenPage({Key key, this.title, this.level}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -25,30 +27,40 @@ class GameScreenPage extends StatefulWidget {
   final String title;
 
   @override
-  _GameScreenPageState createState() => _GameScreenPageState();
+  _GameScreenPageState createState() => _GameScreenPageState(level: level);
 }
 
 class _GameScreenPageState extends State<GameScreenPage> {
-  int _counter = 0;
-  Config diff = new Config(level: Level.medium);
-  MapGenerator generator;
+  Level level = Level.easy;
+  Config diff;
+  MapGenerator gameManager;
   List<List<Node>> list;
-  int seconds = 0;
-
-  _GameScreenPageState() {}
+  Timer timer1;
+  _GameScreenPageState({this.level}) ;
 
   @override
   void initState() {
     super.initState();
-    generator = new MapGenerator(diff);
-    list = generator.getNewMap();
-    Timer.periodic(Duration(seconds: 1), (timer) {
-      seconds++;
-      setState(() {});
-      if (generator.gameFinished()) {
+    diff = new Config(level: level);
+    gameManager = new MapGenerator(diff);
+    list = gameManager.getNewMap();
+    timer1 = Timer.periodic(Duration(seconds: 1), (timer) {
+      gameManager.time++;
+      if (gameManager.gameFinished()) {
         timer.cancel();
+        return;
+      } else {
+        setState(() {});
       }
     });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    gameManager = null;
+    timer1.cancel();
   }
 
   @override
@@ -65,144 +77,169 @@ class _GameScreenPageState extends State<GameScreenPage> {
 //        // the App.build method, and use it to set our appbar title.
 //        title: Text(widget.title),
 //      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Align(
-            alignment: Alignment.topCenter,
-            child: Padding(
-              padding: new EdgeInsets.fromLTRB(0, 72, 0, 12),
-              child: Text(
-                'MINESWEEPER',
-                style: TextStyle(fontSize: 32, color: Colors.black),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: new LinearGradient(
+              colors: [
+                Colors.blueAccent,
+                const Color(0xff064169),
+              ],
+              begin: const FractionalOffset(0.0, 0.0),
+              end: const FractionalOffset(1.0, 1.0),
+              stops: [0.0, 1.0],
+              tileMode: TileMode.clamp),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: new EdgeInsets.fromLTRB(0, 72, 0, 12),
+                child: Text(
+                  'MINESWEEPER',
+                  style: TextStyle(fontSize: 32, color: Colors.black),
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: new EdgeInsets.fromLTRB(0, 24, 0, 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Text(
-                        'POINTS SCORED',
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                      ),
-                      Text(
-                        '123',
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                      ),
-                    ]),
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        'TIME ELAPSED',
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                      ),
-                      Text(
-                        seconds.toString() + 's',
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                      ),
-                    ]),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Stack(
-                fit: StackFit.loose,
-                alignment: AlignmentDirectional.center,
+            Padding(
+              padding: new EdgeInsets.fromLTRB(0, 24, 0, 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Opacity(
-                    opacity: generator.gameFinished() ? 0.5 : 1,
-                    child: IgnorePointer(
-                        ignoring: generator.gameFinished(),
-                        child: GridView.builder(
-                          padding: EdgeInsets.all(10),
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: generator.column * generator.row,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: generator.column,
-                          ),
-                          itemBuilder: (context, position) {
-                            int cPos = position;
-                            int row = (cPos / generator.column).toInt();
-                            int col = cPos % generator.column;
-                            return InkWell(
-                              child: new NodeWidget(node: list[row][col]),
-                              onLongPress: (() {
-                                bool isFlag = list[row][col].setFlag();
-                                generator.longPress(isFlag);
-                                print("Finished" +
-                                    generator.gameFinished().toString());
-                                setState(() {});
-                              }),
-                              onTap: (() {
-                                if (list[row][col].isBomb()) {
-                                  list[row][col].onTap();
-                                  generator.bombIsPressed();
-                                } else {
-                                  openUp(row, col);
-                                }
-                                print("Finished" +
-                                    generator.gameFinished().toString());
-                                //list[row][col].onTap()
-                                setState(() {});
-                              }),
-                            );
-                          },
-                        )),
-                  ),
+                  Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Text(
+                          'POINTS SCORED',
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                        Text(
+                          gameManager.points.toString(),
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                      ]),
+                  Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'TIME ELAPSED',
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                        Text(
+                          gameManager.time.toString() + 's',
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                      ]),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Stack(
+                  fit: StackFit.loose,
+                  alignment: AlignmentDirectional.center,
+                  children: <Widget>[
+                    Center(
+                      child: Opacity(
+                        opacity: gameManager.gameFinished() ? 0.2 : 1,
+                        child: IgnorePointer(
+                            ignoring: gameManager.gameFinished(),
+                            child: GridView.builder(
+                              padding: EdgeInsets.all(10),
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: gameManager.column * gameManager.row,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: gameManager.column,
+                              ),
+                              itemBuilder: (context, position) {
+                                int cPos = position;
+                                int row = (cPos / gameManager.column).toInt();
+                                int col = cPos % gameManager.column;
+                                return InkWell(
+                                  child: new NodeWidget(node: list[row][col]),
+                                  onLongPress: (() {
+                                    bool isFlag = list[row][col].setFlag();
+                                    gameManager.longPress(isFlag);
+                                    print("Finished" +
+                                        gameManager.gameFinished().toString());
+                                    setState(() {});
+                                  }),
+                                  onTap: (() {
+                                    if (list[row][col].isBomb()) {
+                                      list[row][col].onTap();
+                                      gameManager.bombIsPressed();
+                                    } else {
+                                      openUp(row, col);
+                                    }
+                                    print("Finished" +
+                                        gameManager.gameFinished().toString());
+                                    //list[row][col].onTap()
+                                    setState(() {});
+                                  }),
+                                );
+                              },
+                            )),
+                      ),
+                    ),
 
-                  Center(
-                    child: Opacity(
-                      opacity: generator.gameFinished() ? 1 : 0,
+                    Center(
                       child: IgnorePointer(
-                        ignoring: !generator.gameFinished(),
-                        child: FlatButton.icon(
-                            padding: EdgeInsets.fromLTRB(6,6,16,6),
-                            splashColor: Colors.tealAccent,
-                          color: Colors.teal,
-                          label: Text(
-                            'MAIN MENU',
-                            style: TextStyle(
-                                fontFamily: 'oswald',
-                                fontWeight: FontWeight.normal,
-                                fontSize: 24,
-                                color: Colors.white),
+                        ignoring: !gameManager.gameFinished(),
+                        child: Opacity(
+                          opacity: gameManager.gameFinished() ? 1 : 0,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Align(
+                                child: Text(gameManager.isBombPressed() ? 'YOU LOSE' :'YOU WIN', style: TextStyle(color: Colors.white, fontSize: 32),),
+                                alignment: Alignment.center,
+                              ),
+
+                              FlatButton.icon(
+                                  padding: EdgeInsets.fromLTRB(6,6,16,6),
+                                  splashColor: Colors.tealAccent,
+                                color: Colors.teal,
+                                label: Text(
+                                  'MAIN MENU',
+                                  style: TextStyle(
+                                      fontFamily: 'oswald',
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 24,
+                                      color: Colors.white),
+                                ),
+                                icon: Icon(Icons.adb),
+                                textColor: Colors.white,
+                                onPressed: (() {
+                                  mainMenu(context);
+                                })
+                              ),
+                            ],
                           ),
-                          icon: Icon(Icons.adb),
-                          textColor: Colors.white,
-                          onPressed: (() {
-                            mainMenu(context);
-                          })
                         ),
                       ),
                     ),
-                  ),
-                ]),
-          ),
-        ],
+                  ]),
+            ),
+          ],
+        ),
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
   openUp(row, col) {
-    if (row >= generator.row || row < 0 || col >= generator.column || col < 0)
+    if (row >= gameManager.row || row < 0 || col >= gameManager.column || col < 0)
       return;
     if (list[row][col].isOpened) return;
     if (list[row][col].getValue() != 0) {
       list[row][col].onTap();
-      generator.addOpened();
+      gameManager.addOpened();
       return;
     }
     list[row][col].onTap();
-    generator.addOpened();
+    gameManager.addOpened();
     openUp(row - 1, col);
     openUp(row + 1, col);
     openUp(row, col - 1);
@@ -210,7 +247,7 @@ class _GameScreenPageState extends State<GameScreenPage> {
   }
 
   void startNewGame() {
-    list = generator.getNewMap();
+    list = gameManager.getNewMap();
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below

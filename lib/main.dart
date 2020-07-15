@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:mine_sweeper/nodes/map_generator.dart';
+import 'package:mine_sweeper/helper/helper.dart';
+import 'package:mine_sweeper/nodes/game_manager.dart';
 import 'package:mine_sweeper/nodes/prefs.dart';
 import 'package:mine_sweeper/routes/game_screen.dart';
 import 'package:mine_sweeper/widgets/node_widget.dart';
@@ -28,9 +29,10 @@ class MyApp extends StatelessWidget {
           // Cast the arguments to the correct type: ScreenArguments.
           // Then, extract the required data from the arguments and
           // pass the data to the correct screen.
+          Level level = settings.arguments;
           return MaterialPageRoute(
             builder: (context) {
-              return GameScreenPage();
+              return GameScreenPage(level: level,);
             },
           );
         }
@@ -61,6 +63,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState() {}
 
+  Level level = Level.easy;
+
+
   @override
   void initState() {
     super.initState();
@@ -80,48 +85,112 @@ class _MyHomePageState extends State<MyHomePage> {
 //        // the App.build method, and use it to set our appbar title.
 //        title: Text(widget.title),
 //      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Align(
-            alignment: Alignment.topCenter,
-            child: Padding(
-              padding: new EdgeInsets.fromLTRB(0, 72, 0, 12),
-              child: Text(
-                'MINESWEEPER',
-                style: TextStyle(fontSize: 40, color: Colors.black),
+    //const Color(0xff38243E), chatTwo: const Color(0xff6F5A77)
+      body: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xff064169),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: new EdgeInsets.fromLTRB(0, 128, 0, 12),
+                child: Text(
+                  'MINESWEEPER',
+                  style: TextStyle(fontSize: 36, color: Colors.white),
+                ),
               ),
             ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-                padding: new EdgeInsets.fromLTRB(32, 0, 32, 64),
-                child: FlatButton.icon(
-                  padding: EdgeInsets.fromLTRB(6,6,16,6),
-              splashColor: Colors.tealAccent,
-              color: Colors.teal,
-              label: Text(
-                'START GAME',
-                style: TextStyle(
-                    fontFamily: 'oswald',
-                    fontWeight: FontWeight.normal,
-                    fontSize: 24,
-                    color: Colors.white),
-              ),
-              icon: Icon(Icons.adb),
-              textColor: Colors.white,
-              onPressed: startGame,
-            )
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0,20,0,0),
+              child: FutureBuilder<String>(
+                // get the languageCode, saved in the preferences
+                  future: Helper().getHighScore(Level.easy),
+                  initialData: 'en',
+                  builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                    return   Text(snapshot.hasData ? 'LEVEL EASY\nBEST TIME : ' + snapshot.data + " seconds":'LEVEL EASY \nNO BEST TIME ESTABLISHED', style: TextStyle(color: Colors.white, fontSize: 16),textAlign: TextAlign.center,);
+                  }),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0,0,0,20),
+              child: FutureBuilder<String>(
+                // get the languageCode, saved in the preferences
+                  future: Helper().getHighScore(Level.medium),
+                  initialData: 'en',
+                  builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                    return   Text(snapshot.hasData ? 'LEVEL HARD\nBEST TIME : ' + snapshot.data + " seconds":'LEVEL HARD \nNO BEST TIME ESTABLISHED', style: TextStyle(color: Colors.white, fontSize: 16),textAlign: TextAlign.center,);
+                  }),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Flexible(
+                        flex: 1,
+                        child: ChoiceChip(
+                            label: Text("EASY"),
+                            selected: level == Level.easy,
+                            selectedColor: Colors.white,
+                            disabledColor: Colors.black54,
+                            onSelected: (bool value) {
+                              setState(() {
+                                level = Level.easy;
+                              });
+                            }),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
+                        child: Text(level == Level.easy ? " << DIFFICULTY " : " DIFFICULTY >> ", style: TextStyle(fontSize: 16, color: Colors.white),),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: ChoiceChip(
+                            label: Text("HARD"),
+                            selected: level == Level.medium,
+                            selectedColor: Colors.white,
+                            onSelected: (bool value) {
+                              setState(() {
+                                level = Level.medium;
+                              });
+                            }),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                      padding: new EdgeInsets.fromLTRB(32, 32, 32, 64),
+                      child: FlatButton.icon(
+                        padding: EdgeInsets.fromLTRB(6,6,16,6),
+                    splashColor: Colors.tealAccent,
+                    color: Colors.blueAccent,
+                    label: Text(
+                      'START GAME',
+                      style: TextStyle(
+                          fontFamily: 'oswald',
+                          fontWeight: FontWeight.normal,
+                          fontSize: 24,
+                          color: Colors.white),
+                    ),
+                    icon: Icon(Icons.adb),
+                    textColor: Colors.white,
+                    onPressed: startGame,
+                  )
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
   startGame() {
-    Navigator.pushNamed(context, GameScreenPage.routeName);
+    Navigator.pushNamed(context, GameScreenPage.routeName, arguments: level);
   }
 }

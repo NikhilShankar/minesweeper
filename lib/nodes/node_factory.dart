@@ -1,8 +1,7 @@
-import 'dart:typed_data';
-
-import 'package:flutter/material.dart';
 import 'package:mine_sweeper/nodes/node.dart';
 
+//Abstract Factory Implementation for creating different types
+//of node based on the value it needs to hold.
 class NodeFactory {
 
   NodeFactory(){}
