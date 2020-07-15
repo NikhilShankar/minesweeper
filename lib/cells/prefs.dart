@@ -8,7 +8,7 @@ class Config {
 
   Config({this.level});
 
-  int getBombNum() {
+  int getMineNumber() {
     switch(level) {
       case Level.medium:
         return 40;

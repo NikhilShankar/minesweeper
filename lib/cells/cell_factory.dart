@@ -9,7 +9,7 @@ class CellFactory {
   Cell getCell(int num) {
     if(num < 8)
       return new SafeCell(num);
-    return new CellNode(num);
+    return new MineCell(num);
 
   }
 

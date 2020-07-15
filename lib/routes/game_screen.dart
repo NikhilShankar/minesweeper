@@ -159,9 +159,9 @@ class _GameScreenPageState extends State<GameScreenPage> {
                                     setState(() {});
                                   }),
                                   onTap: (() {
-                                    if (list[row][col].isBomb()) {
+                                    if (list[row][col].isMine()) {
                                       list[row][col].onTap();
-                                      gameManager.bombIsPressed();
+                                      gameManager.mineIsPressed();
                                     } else {
                                       gameManager.openUp(row, col);
                                     }
@@ -182,7 +182,7 @@ class _GameScreenPageState extends State<GameScreenPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               Align(
-                                child: Text(gameManager.isBombPressed() ? 'YOU LOSE' :'YOU WIN', style: TextStyle(color: Colors.white, fontSize: 32),),
+                                child: Text(gameManager.isMinePressed() ? 'YOU LOSE' :'YOU WIN', style: TextStyle(color: Colors.white, fontSize: 32),),
                                 alignment: Alignment.center,
                               ),
 

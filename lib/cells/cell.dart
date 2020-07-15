@@ -57,19 +57,21 @@ abstract class Cell implements CellType {
 }
 
 class CellType{
-  bool isBomb(){}
+  bool isMine(){}
   bool isCorrectlyFlagged(){}
   String getPath(){}
 }
 
-class CellNode extends Cell{
+//Concrete implementation of Cell
+//which is mine.
+class MineCell extends Cell{
 
   String path = "";
 
-  CellNode(int n) : super(n);
+  MineCell(int n) : super(n);
 
   @override
-  bool isBomb() {
+  bool isMine() {
     // TODO: implement isBomb
     return true;
   }
@@ -87,12 +89,14 @@ class CellNode extends Cell{
 
 }
 
+//Concrete implementation of Cell
+//which is safe.
 class SafeCell extends Cell {
 
   SafeCell(int n) : super(n);
 
   @override
-  bool isBomb() {
+  bool isMine() {
     // TODO: implement isBomb
     return false;
   }

@@ -16,7 +16,7 @@ class GameManager {
   Config config;
   int opened = 0;
   int flagsUsed = 0;
-  bool bombPressed = false;
+  bool minePressed = false;
   CellFactory factory;
   int points = 0;
   int time = 0;
@@ -43,14 +43,14 @@ class GameManager {
     int col = config.getMapHeight();
     Random random = new Random();
     int placedBombs = 0;
-    while (placedBombs != config.getBombNum()) {
+    while (placedBombs != config.getMineNumber()) {
       //We are not placing bombs in the corners or fence lines.
       //This greatly reduces conditions that we need to check and hence performance improves.
       int rowNum = random.nextInt(row - 2) + 1;
       int colNum = random.nextInt(col - 2) + 1;
       //generating a bomb node;
       Cell n = list[rowNum][colNum];
-      if (!n.isBomb()) {
+      if (!n.isMine()) {
         list[rowNum][colNum] = factory.getCell(9);
         placedBombs++;
         for(int k = rowNum - 1; k <= rowNum + 1; k ++) {
@@ -84,17 +84,17 @@ class GameManager {
     opened++;
   }
 
-  bombIsPressed() {
-    bombPressed = true;
+  mineIsPressed() {
+    minePressed = true;
   }
 
-  bool isBombPressed() {
-    return bombPressed;
+  bool isMinePressed() {
+    return minePressed;
   }
 
   bool gameFinished() {
-    bool finished =  bombPressed || (flagsUsed + opened) == (config.getMapWidth() * config.getMapHeight());
-    if(finished && !bombPressed) {
+    bool finished =  minePressed || (flagsUsed + opened) == (config.getMapWidth() * config.getMapHeight());
+    if(finished && !minePressed) {
       print("HI SCORE CREATED");
       Helper().setHiScore(time, config.level);
     }
