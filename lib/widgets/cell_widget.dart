@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mine_sweeper/nodes/game_manager.dart';
-import 'package:mine_sweeper/nodes/node.dart';
+import 'package:mine_sweeper/nodes/cell.dart';
 import 'package:mine_sweeper/nodes/prefs.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 
-class NodeWidget extends StatefulWidget {
-  NodeWidget({Key key, this.node}) : super(key: key);
+class CellWidget extends StatefulWidget {
+  CellWidget({Key key, this.cell}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -16,21 +16,21 @@ class NodeWidget extends StatefulWidget {
   // case the title) provided by the parent (in this case the App widget) and
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
-  final Node node;
+  final Cell cell;
 
   @override
-  _NodeWidgetState createState() => _NodeWidgetState(node: node);
+  _CellWidgetState createState() => _CellWidgetState(cell: cell);
 }
 
-class _NodeWidgetState extends State<NodeWidget> {
+class _CellWidgetState extends State<CellWidget> {
 
-  Node node;
-  _NodeWidgetState({this.node});
+  Cell cell;
+  _CellWidgetState({this.cell});
 
   @override
   Widget build(BuildContext context) {
     return Image(
-      image: AssetImage(node.getPath()),
+      image: AssetImage(cell.getPath()),
     );
   }
 

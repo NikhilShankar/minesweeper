@@ -3,10 +3,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:mine_sweeper/helper/helper.dart';
-import 'package:mine_sweeper/nodes/node.dart';
+import 'package:mine_sweeper/nodes/cell.dart';
 import 'package:mine_sweeper/nodes/prefs.dart';
 
-import 'node_factory.dart';
+import 'cell_factory.dart';
 
 //Game manager handles all game related logic, like points timer etc.
 class GameManager {
@@ -17,7 +17,7 @@ class GameManager {
   int opened = 0;
   int flagsUsed = 0;
   bool bombPressed = false;
-  NodeFactory factory;
+  CellFactory factory;
   int points = 0;
   int time = 0;
 
@@ -25,30 +25,22 @@ class GameManager {
     this.config = x;
     this.row = x.getMapWidth();
     this.column = x.getMapHeight();
-    factory = new NodeFactory();
-    list = List.generate(row, (i) => List<Node>(column), growable: false);
+    factory = new CellFactory();
+    list = List.generate(row, (i) => List<Cell>(column), growable: false);
   }
 
   refreshMap() {
     for(int k = 0; k < row ; k ++) {
       for (int l = 0; l < column; l++) {
-        list[k][l] = factory.getNode(0);
+        list[k][l] = factory.getCell(0);
       }
     }
   }
 
-  refreshFlags() {
-    opened = 0;
-    flagsUsed = 0;
-    time = 0;
-    points = 0;
-  }
-
-  List<List<Node>> getNewMap() {
+  List<List<Cell>> getNewMap() {
     refreshMap();
     int row = config.getMapWidth();
     int col = config.getMapHeight();
-    int totalNodes = row * col;
     Random random = new Random();
     int placedBombs = 0;
     while (placedBombs != config.getBombNum()) {
@@ -57,16 +49,16 @@ class GameManager {
       int rowNum = random.nextInt(row - 2) + 1;
       int colNum = random.nextInt(col - 2) + 1;
       //generating a bomb node;
-      Node n = list[rowNum][colNum];
+      Cell n = list[rowNum][colNum];
       if (!n.isBomb()) {
-        list[rowNum][colNum] = factory.getNode(9);
+        list[rowNum][colNum] = factory.getCell(9);
         placedBombs++;
         for(int k = rowNum - 1; k <= rowNum + 1; k ++) {
           for(int l = colNum - 1; l <= colNum + 1; l ++) {
             if(k == rowNum && l == colNum) {
               continue;
             }
-            Node n = list[k][l];
+            Cell n = list[k][l];
             n.incrementValue();
             list[k][l] = n;
           }
@@ -109,6 +101,7 @@ class GameManager {
     return finished;
   }
 
+  //Implementation of flood fill algorithm using recursion.
   openUp(row1, col1) {
     if (row1 >= row || row1 < 0 || col1 >= column || col1 < 0)
       return;

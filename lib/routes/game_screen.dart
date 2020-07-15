@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mine_sweeper/nodes/game_manager.dart';
-import 'package:mine_sweeper/nodes/node.dart';
+import 'package:mine_sweeper/nodes/cell.dart';
 import 'package:mine_sweeper/nodes/prefs.dart';
-import 'package:mine_sweeper/widgets/node_widget.dart';
+import 'package:mine_sweeper/widgets/cell_widget.dart';
 
 import 'dart:async';
 
@@ -34,7 +34,7 @@ class _GameScreenPageState extends State<GameScreenPage> {
   Level level = Level.easy;
   Config diff;
   GameManager gameManager;
-  List<List<Node>> list;
+  List<List<Cell>> list;
   Timer timer1;
   _GameScreenPageState({this.level}) ;
 
@@ -79,15 +79,7 @@ class _GameScreenPageState extends State<GameScreenPage> {
 //      ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: new LinearGradient(
-              colors: [
-                Colors.blueAccent,
-                const Color(0xff064169),
-              ],
-              begin: const FractionalOffset(0.0, 0.0),
-              end: const FractionalOffset(1.0, 1.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp),
+          color: const Color(0xff064169),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -98,7 +90,7 @@ class _GameScreenPageState extends State<GameScreenPage> {
                 padding: new EdgeInsets.fromLTRB(0, 72, 0, 12),
                 child: Text(
                   'MINESWEEPER',
-                  style: TextStyle(fontSize: 32, color: Colors.black),
+                  style: TextStyle(fontSize: 32, color: Colors.white),
                 ),
               ),
             ),
@@ -112,11 +104,11 @@ class _GameScreenPageState extends State<GameScreenPage> {
                       children: <Widget>[
                         Text(
                           'POINTS SCORED',
-                          style: TextStyle(color: Colors.black, fontSize: 16),
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                         Text(
                           gameManager.points.toString(),
-                          style: TextStyle(color: Colors.black, fontSize: 16),
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ]),
                   Column(
@@ -124,11 +116,11 @@ class _GameScreenPageState extends State<GameScreenPage> {
                       children: <Widget>[
                         Text(
                           'TIME ELAPSED',
-                          style: TextStyle(color: Colors.black, fontSize: 16),
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                         Text(
                           gameManager.time.toString() + 's',
-                          style: TextStyle(color: Colors.black, fontSize: 16),
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ]),
                 ],
@@ -158,12 +150,12 @@ class _GameScreenPageState extends State<GameScreenPage> {
                                 int row = (cPos / gameManager.column).toInt();
                                 int col = cPos % gameManager.column;
                                 return InkWell(
-                                  child: new NodeWidget(node: list[row][col]),
+                                  child: new CellWidget(cell: list[row][col]),
                                   onLongPress: (() {
+                                    if(list[row][col].isOpened)
+                                      return;
                                     bool isFlag = list[row][col].setFlag();
                                     gameManager.longPress(isFlag);
-                                    print("Finished" +
-                                        gameManager.gameFinished().toString());
                                     setState(() {});
                                   }),
                                   onTap: (() {
@@ -173,9 +165,6 @@ class _GameScreenPageState extends State<GameScreenPage> {
                                     } else {
                                       gameManager.openUp(row, col);
                                     }
-                                    print("Finished" +
-                                        gameManager.gameFinished().toString());
-                                    //list[row][col].onTap()
                                     setState(() {});
                                   }),
                                 );
@@ -200,7 +189,7 @@ class _GameScreenPageState extends State<GameScreenPage> {
                               FlatButton.icon(
                                   padding: EdgeInsets.fromLTRB(6,6,16,6),
                                   splashColor: Colors.tealAccent,
-                                color: Colors.teal,
+                                color: Colors.blueAccent,
                                 label: Text(
                                   'MAIN MENU',
                                   style: TextStyle(

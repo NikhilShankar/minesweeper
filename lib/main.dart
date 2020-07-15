@@ -1,16 +1,16 @@
-import 'dart:async';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mine_sweeper/helper/helper.dart';
-import 'package:mine_sweeper/nodes/game_manager.dart';
 import 'package:mine_sweeper/nodes/prefs.dart';
 import 'package:mine_sweeper/routes/game_screen.dart';
-import 'package:mine_sweeper/widgets/node_widget.dart';
 
-import 'nodes/node.dart';
-
-void main() => runApp(MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
+      .then((_) => runApp(MyApp()));
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -80,12 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-//      appBar: AppBar(
-//        // Here we take the value from the MyHomePage object that was created by
-//        // the App.build method, and use it to set our appbar title.
-//        title: Text(widget.title),
-//      ),
-    //const Color(0xff38243E), chatTwo: const Color(0xff6F5A77)
       body: Container(
         decoration: BoxDecoration(
           color: const Color(0xff064169),
@@ -116,7 +110,6 @@ class _MyHomePageState extends State<MyHomePage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(0,0,0,20),
               child: FutureBuilder<String>(
-                // get the languageCode, saved in the preferences
                   future: Helper().getHighScore(Level.medium),
                   initialData: 'en',
                   builder: (BuildContext context, AsyncSnapshot<String> snapshot) {

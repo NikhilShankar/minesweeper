@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:mine_sweeper/helper/helper.dart';
 
-abstract class Node implements NodeType {
+abstract class Cell implements CellType {
 
   static Helper helper = new Helper();
   bool isOpened = false;
@@ -11,7 +11,7 @@ abstract class Node implements NodeType {
   //for storing the number that it represents.
   var num = new ByteData(4);
 
-  Node(int n) {
+  Cell(int n) {
     if(n > 9) {
       throw ("Unsupported value");
     }
@@ -45,10 +45,10 @@ abstract class Node implements NodeType {
   String getPath() {
     // TODO: implement getPath
     if (isFlagged())
-      return Node.helper.getFlaggedImage();
+      return Cell.helper.getFlaggedImage();
 
     if (!isOpened) {
-      return Node.helper.getClosedImage();
+      return Cell.helper.getClosedImage();
     }
 
     return null;
@@ -56,17 +56,17 @@ abstract class Node implements NodeType {
 
 }
 
-class NodeType{
+class CellType{
   bool isBomb(){}
   bool isCorrectlyFlagged(){}
   String getPath(){}
 }
 
-class BombNode extends Node{
+class CellNode extends Cell{
 
   String path = "";
 
-  BombNode(int n) : super(n);
+  CellNode(int n) : super(n);
 
   @override
   bool isBomb() {
@@ -82,14 +82,14 @@ class BombNode extends Node{
   @override
   String getPath() {
     String x = super.getPath();
-    return x != null ? x : Node.helper.getBombImage();
+    return x != null ? x : Cell.helper.getBombImage();
   }
 
 }
 
-class SafeNode extends Node {
+class SafeCell extends Cell {
 
-  SafeNode(int n) : super(n);
+  SafeCell(int n) : super(n);
 
   @override
   bool isBomb() {
@@ -105,7 +105,7 @@ class SafeNode extends Node {
   @override
   String getPath() {
     String x = super.getPath();
-    return x != null ? x : Node.helper.getSafeNodeImage(getValue());
+    return x != null ? x : Cell.helper.getSafeCellImage(getValue());
   }
 
 }
