@@ -1,6 +1,10 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:mine_sweeper/nodes/map_generator.dart';
 import 'package:mine_sweeper/nodes/prefs.dart';
+import 'package:mine_sweeper/routes/game_screen.dart';
 import 'package:mine_sweeper/widgets/node_widget.dart';
 
 import 'nodes/node.dart';
@@ -14,16 +18,23 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
+        fontFamily: 'Oswald',
         primarySwatch: Colors.blue,
       ),
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        // If you push the PassArguments route
+        if (settings.name == GameScreenPage.routeName) {
+          // Cast the arguments to the correct type: ScreenArguments.
+          // Then, extract the required data from the arguments and
+          // pass the data to the correct screen.
+          return MaterialPageRoute(
+            builder: (context) {
+              return GameScreenPage();
+            },
+          );
+        }
+      },
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -48,15 +59,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  Config diff = new Config(level: Level.medium);
-  MapGenerator generator;
-  List<List<Node>> list;
+  _MyHomePageState() {}
 
-  _MyHomePageState() {
-    generator = new MapGenerator(diff);
-    list =  generator.getNewMap();
-    print("Hash" + list.hashCode.toString());
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -68,85 +75,53 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: GridView.builder(
-          padding: EdgeInsets.all(5),
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: generator.column * generator.row,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: generator.column,
+//      appBar: AppBar(
+//        // Here we take the value from the MyHomePage object that was created by
+//        // the App.build method, and use it to set our appbar title.
+//        title: Text(widget.title),
+//      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: new EdgeInsets.fromLTRB(0, 72, 0, 12),
+              child: Text(
+                'MINESWEEPER',
+                style: TextStyle(fontSize: 40, color: Colors.black),
+              ),
+            ),
           ),
-          itemBuilder: (context, position) {
-            int cPos = position - 1;
-            int row = (cPos / generator.column).toInt();
-            int col = cPos % generator.column;
-            return InkWell(
-              child: new NodeWidget(node: list[row][col]),
-              onLongPress: (() {
-                bool isFlag = list[row][col].setFlag();
-                generator.longPress(isFlag);
-                print("Finished" + generator.gameFinished().toString());
-                setState(() {
-
-                });
-              }),
-              onTap: ((){
-                openUp(row, col);
-                print("Finished" + generator.gameFinished().toString());
-                //list[row][col].onTap();
-                if(list[row][col].isBomb()) {
-                  print("Game Over");
-                }
-                setState(() {
-
-                });
-              }),
-            );
-
-          },
-        )
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+                padding: new EdgeInsets.fromLTRB(32, 0, 32, 64),
+                child: FlatButton.icon(
+                  padding: EdgeInsets.fromLTRB(6,6,16,6),
+              splashColor: Colors.tealAccent,
+              color: Colors.teal,
+              label: Text(
+                'START GAME',
+                style: TextStyle(
+                    fontFamily: 'oswald',
+                    fontWeight: FontWeight.normal,
+                    fontSize: 24,
+                    color: Colors.white),
+              ),
+              icon: Icon(Icons.adb),
+              textColor: Colors.white,
+              onPressed: startGame,
+            )
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: startNewGame,
-        tooltip: 'Increment',
-        child: Icon(Icons.settings_backup_restore),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
-  openUp(row, col) {
-    if(row >= generator.row || row < 0 || col >= generator.column || col< 0) return;
-    if(list[row][col].isOpened) return;
-    if(list[row][col].getValue() != 0) {
-      list[row][col].onTap();
-      generator.addOpened();
-      return;
-    }
-    list[row][col].onTap();
-    generator.addOpened();
-    openUp(row-1, col);
-    openUp(row+1, col);
-    openUp(row, col -1);
-    openUp(row,col+1);
-  }
-
-  void startNewGame() {
-    list = generator.getNewMap();
-    print("Hash" + list.hashCode.toString());
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-    });
+  startGame() {
+    Navigator.pushNamed(context, GameScreenPage.routeName);
   }
 }

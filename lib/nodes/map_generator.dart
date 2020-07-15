@@ -15,6 +15,7 @@ class MapGenerator {
   Config config;
   int opened = 0;
   int flagsUsed = 0;
+  bool bombPressed = false;
   NodeFactory factory;
 
   MapGenerator(Config x) {
@@ -81,8 +82,12 @@ class MapGenerator {
     opened++;
   }
 
+  bombIsPressed() {
+    bombPressed = true;
+  }
+
   bool gameFinished() {
-    return (flagsUsed + opened) == (config.getMapWidth() * config.getMapHeight());
+    return bombPressed || (flagsUsed + opened) == (config.getMapWidth() * config.getMapHeight());
   }
 
 }
