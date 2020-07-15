@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mine_sweeper/nodes/game_manager.dart';
-import 'package:mine_sweeper/nodes/cell.dart';
-import 'package:mine_sweeper/nodes/prefs.dart';
+import 'package:mine_sweeper/cells/game_manager.dart';
+import 'package:mine_sweeper/cells/cell.dart';
+import 'package:mine_sweeper/cells/prefs.dart';
 import 'package:mine_sweeper/widgets/cell_widget.dart';
 
 import 'dart:async';

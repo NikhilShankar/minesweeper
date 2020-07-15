@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:mine_sweeper/nodes/cell.dart';
+import 'package:mine_sweeper/cells/cell.dart';
 
 class Config {
   Level level;

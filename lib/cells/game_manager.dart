@@ -3,8 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:mine_sweeper/helper/helper.dart';
-import 'package:mine_sweeper/nodes/cell.dart';
-import 'package:mine_sweeper/nodes/prefs.dart';
+import 'package:mine_sweeper/cells/cell.dart';
+import 'package:mine_sweeper/cells/prefs.dart';
 
 import 'cell_factory.dart';
 

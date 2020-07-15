@@ -1,4 +1,4 @@
-import 'package:mine_sweeper/nodes/cell.dart';
+import 'package:mine_sweeper/cells/cell.dart';
 
 //Abstract Factory Implementation for creating different types
 //of node based on the value it needs to hold.

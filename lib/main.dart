@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mine_sweeper/helper/helper.dart';
-import 'package:mine_sweeper/nodes/prefs.dart';
+import 'package:mine_sweeper/cells/prefs.dart';
 import 'package:mine_sweeper/routes/game_screen.dart';
 
 void main() {

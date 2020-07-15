@@ -1,7 +1,7 @@
 
 import 'dart:collection';
 
-import 'package:mine_sweeper/nodes/prefs.dart';
+import 'package:mine_sweeper/cells/prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 //Singleton Helper class

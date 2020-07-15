@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mine_sweeper/nodes/game_manager.dart';
-import 'package:mine_sweeper/nodes/cell.dart';
-import 'package:mine_sweeper/nodes/prefs.dart';
+import 'package:mine_sweeper/cells/game_manager.dart';
+import 'package:mine_sweeper/cells/cell.dart';
+import 'package:mine_sweeper/cells/prefs.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
