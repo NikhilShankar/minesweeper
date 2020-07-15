@@ -8,11 +8,11 @@ import 'package:mine_sweeper/nodes/prefs.dart';
 
 import 'node_factory.dart';
 
-
-class MapGenerator {
+//Game manager handles all game related logic, like points timer etc.
+class GameManager {
   int row;
   int column;
-  var map;
+  var list;
   Config config;
   int opened = 0;
   int flagsUsed = 0;
@@ -21,18 +21,18 @@ class MapGenerator {
   int points = 0;
   int time = 0;
 
-  MapGenerator(Config x) {
+  GameManager(Config x) {
     this.config = x;
     this.row = x.getMapWidth();
     this.column = x.getMapHeight();
     factory = new NodeFactory();
-    map = List.generate(row, (i) => List<Node>(column), growable: false);
+    list = List.generate(row, (i) => List<Node>(column), growable: false);
   }
 
   refreshMap() {
     for(int k = 0; k < row ; k ++) {
       for (int l = 0; l < column; l++) {
-        map[k][l] = factory.getNode(0);
+        list[k][l] = factory.getNode(0);
       }
     }
   }
@@ -57,23 +57,23 @@ class MapGenerator {
       int rowNum = random.nextInt(row - 2) + 1;
       int colNum = random.nextInt(col - 2) + 1;
       //generating a bomb node;
-      Node n = map[rowNum][colNum];
+      Node n = list[rowNum][colNum];
       if (!n.isBomb()) {
-        map[rowNum][colNum] = factory.getNode(9);
+        list[rowNum][colNum] = factory.getNode(9);
         placedBombs++;
         for(int k = rowNum - 1; k <= rowNum + 1; k ++) {
           for(int l = colNum - 1; l <= colNum + 1; l ++) {
             if(k == rowNum && l == colNum) {
               continue;
             }
-            Node n = map[k][l];
+            Node n = list[k][l];
             n.incrementValue();
-            map[k][l] = n;
+            list[k][l] = n;
           }
         }
       }
     }
-    return map;
+    return list;
   }
 
   longPress(bool isFlag) {
@@ -107,6 +107,23 @@ class MapGenerator {
       Helper().setHiScore(time, config.level);
     }
     return finished;
+  }
+
+  openUp(row1, col1) {
+    if (row1 >= row || row1 < 0 || col1 >= column || col1 < 0)
+      return;
+    if (list[row1][col1].isOpened) return;
+    if (list[row1][col1].getValue() != 0) {
+      list[row1][col1].onTap();
+      addOpened();
+      return;
+    }
+    list[row1][col1].onTap();
+    addOpened();
+    openUp(row1 - 1, col1);
+    openUp(row1 + 1, col1);
+    openUp(row1, col1 - 1);
+    openUp(row1, col1 + 1);
   }
 
 }

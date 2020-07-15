@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:mine_sweeper/nodes/prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+//Singleton Helper class
 class Helper {
 
   static final Helper _instance = Helper._privateConstructor();
@@ -66,7 +67,7 @@ class Helper {
       if(hi == null) {
         prefs.setInt(HISCORE + day, time);
       } else {
-        if(time > hi) {
+        if(time < hi) {
           prefs.setInt(HISCORE + day, time);
         }
       }

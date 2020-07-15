@@ -33,7 +33,7 @@ class GameScreenPage extends StatefulWidget {
 class _GameScreenPageState extends State<GameScreenPage> {
   Level level = Level.easy;
   Config diff;
-  MapGenerator gameManager;
+  GameManager gameManager;
   List<List<Node>> list;
   Timer timer1;
   _GameScreenPageState({this.level}) ;
@@ -42,7 +42,7 @@ class _GameScreenPageState extends State<GameScreenPage> {
   void initState() {
     super.initState();
     diff = new Config(level: level);
-    gameManager = new MapGenerator(diff);
+    gameManager = new GameManager(diff);
     list = gameManager.getNewMap();
     timer1 = Timer.periodic(Duration(seconds: 1), (timer) {
       gameManager.time++;
@@ -171,7 +171,7 @@ class _GameScreenPageState extends State<GameScreenPage> {
                                       list[row][col].onTap();
                                       gameManager.bombIsPressed();
                                     } else {
-                                      openUp(row, col);
+                                      gameManager.openUp(row, col);
                                     }
                                     print("Finished" +
                                         gameManager.gameFinished().toString());
@@ -227,34 +227,6 @@ class _GameScreenPageState extends State<GameScreenPage> {
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
-  }
-
-  openUp(row, col) {
-    if (row >= gameManager.row || row < 0 || col >= gameManager.column || col < 0)
-      return;
-    if (list[row][col].isOpened) return;
-    if (list[row][col].getValue() != 0) {
-      list[row][col].onTap();
-      gameManager.addOpened();
-      return;
-    }
-    list[row][col].onTap();
-    gameManager.addOpened();
-    openUp(row - 1, col);
-    openUp(row + 1, col);
-    openUp(row, col - 1);
-    openUp(row, col + 1);
-  }
-
-  void startNewGame() {
-    list = gameManager.getNewMap();
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-    });
   }
 
   mainMenu(BuildContext context) {
