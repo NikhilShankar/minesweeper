@@ -9,7 +9,7 @@ abstract class Cell implements CellType {
   bool isOpened = false;
   bool isFlag = false;
   //for storing the number that it represents.
-  var num = new ByteData(4);
+  var num = new ByteData(1);
 
   Cell(int n) {
     if(n > 9) {
